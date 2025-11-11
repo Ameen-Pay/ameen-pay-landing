@@ -1,81 +1,6 @@
-import { useState } from 'react'
 import './App.css'
 
 function App() {
-  const [formData, setFormData] = useState({
-    companyName: '',
-    contactName: '',
-    email: '',
-    phone: '',
-    monthlyCommissions: ''
-  })
-  const [submitted, setSubmitted] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [error, setError] = useState(null)
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-    setError(null)
-
-    try {
-      const AIRTABLE_API_KEY = import.meta.env.VITE_AIRTABLE_API_KEY
-      const AIRTABLE_BASE_ID = import.meta.env.VITE_AIRTABLE_BASE_ID
-      const AIRTABLE_TABLE_NAME = import.meta.env.VITE_AIRTABLE_TABLE_NAME || 'Waitlist'
-
-      if (!AIRTABLE_API_KEY || !AIRTABLE_BASE_ID) {
-        throw new Error('Airtable configuration is missing. Please check your environment variables.')
-      }
-
-      const airtableUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE_NAME}`
-
-      const response = await fetch(airtableUrl, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          fields: {
-            'Company Name': formData.companyName,
-            'Contact Name': formData.contactName,
-            'Email Address': formData.email,
-            'Phone Number': formData.phone,
-            'Estimated Monthly Commissions (AED)': formData.monthlyCommissions
-          },
-        }),
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error?.message || 'Failed to submit form')
-      }
-
-      console.log('Form submitted successfully:', formData)
-      setSubmitted(true)
-      
-      // Reset form
-      setFormData({
-        companyName: '',
-        contactName: '',
-        email: '',
-        phone: '',
-        monthlyCommissions: ''
-      })
-    } catch (err) {
-      console.error('Error submitting form:', err)
-      setError(err.message || 'Failed to submit form. Please try again.')
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
-
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    })
-  }
 
   return (
     <div className="App">
@@ -236,89 +161,17 @@ function App() {
             Be among the first real estate agencies to access commission advances
           </p>
           
-          {!submitted ? (
-            <form className="waitlist-form" onSubmit={handleSubmit}>
-              {error && (
-                <div className="error-message">
-                  <p>⚠️ {error}</p>
-                </div>
-              )}
-              <div className="form-grid">
-                <div className="form-group">
-                  <label htmlFor="companyName">Company Name *</label>
-                  <input
-                    type="text"
-                    id="companyName"
-                    name="companyName"
-                    value={formData.companyName}
-                    onChange={handleChange}
-                    required
-                    placeholder="Your Real Estate Agency"
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="contactName">Contact Name *</label>
-                  <input
-                    type="text"
-                    id="contactName"
-                    name="contactName"
-                    value={formData.contactName}
-                    onChange={handleChange}
-                    required
-                    placeholder="Your Name"
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="email">Email Address *</label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                    placeholder="email@example.com"
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="phone">Phone Number *</label>
-                  <input
-                    type="tel"
-                    id="phone"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    required
-                    placeholder="+971 XX XXX XXXX"
-                  />
-                </div>
-              </div>
-              <div className="form-group">
-                <label htmlFor="monthlyCommissions">Estimated Monthly Commissions (AED)</label>
-                <select
-                  id="monthlyCommissions"
-                  name="monthlyCommissions"
-                  value={formData.monthlyCommissions}
-                  onChange={handleChange}
-                >
-                  <option value="">Select range</option>
-                  <option value="50k-100k">50,000 - 100,000 AED</option>
-                  <option value="100k-250k">100,000 - 250,000 AED</option>
-                  <option value="250k-500k">250,000 - 500,000 AED</option>
-                  <option value="500k+">500,000+ AED</option>
-                </select>
-              </div>
-              <button type="submit" className="btn btn-primary btn-large btn-submit" disabled={isSubmitting}>
-                {isSubmitting ? 'Submitting...' : 'Join Waitlist'}
-              </button>
-            </form>
-          ) : (
-            <div className="success-message">
-              <div className="success-icon">✓</div>
-              <h3>Thank You!</h3>
-              <p>We've received your information and will contact you soon.</p>
-            </div>
-          )}
+          <div className="airtable-form-wrapper">
+            <iframe 
+              className="airtable-embed" 
+              src="https://airtable.com/embed/app9b9hGRi0mpKNAS/paguxvQdla8hnkhEv/form" 
+              frameBorder="0" 
+              onMouseWheel="" 
+              width="100%" 
+              height="533" 
+              style={{ background: 'transparent', border: '1px solid #ccc' }}
+            />
+          </div>
         </div>
       </section>
 
